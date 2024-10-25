@@ -1,0 +1,3 @@
+[submodule "interactive_mock"]
+	path = interactive_mock
+	url = https://github.com/montonous/mae-sam2-interface
