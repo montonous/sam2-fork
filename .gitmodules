@@ -1,4 +1,4 @@
 [submodule "interactive_app"]
 	path = interactive_app
-	url = https://github.com/montonous/mae-sam2-interface
+	url = git@github.com:montonous/mae-sam2-interface.git
 	update = rebase
