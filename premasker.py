@@ -1,9 +1,9 @@
-from groundingdino.util.inference import load_model, load_image, predict, annotate
+from modules.GroundingDINO.groundingdino.util.inference import load_model, load_image, predict, annotate
 from sam2.build_sam import build_sam2
 from sam2.sam2_image_predictor import SAM2ImagePredictor
 import cv2 as cv
 import numpy as np
-
+import hydra
 
 def xywh_2_xyxy(boxes):
     x1 = boxes[:, 0] - boxes[:, 2] / 2
@@ -17,17 +17,31 @@ def xywh_2_xyxy(boxes):
 
 class GSAM_entity_masker():
     
-    def __init__(self, image_path:str, text:str) -> None:
+    def __init__(self, 
+                 out_dir:str, 
+                 gdino_model_cfg:str, 
+                 gdino_checkpoint:str, 
+                 sam_model_cfg:str, 
+                 sam_checkpoint:str, 
+                 sam_config_dir:str,
+                 image_path:str, 
+                 text:str
+        ) -> None:
         
+        # hydra.core.global_hydra.GlobalHydra.instance().clear()
+        # hydra.initialize_config_module(sam_config_dir, version_base='1.2')
+
         self.image_path = image_path
-        self.text = text
+        self.text = " . ".join(text)
+        print(self.image_path)
+        print("************************", text)
         self.BOX_TRESHOLD = 0.35
         self.TEXT_TRESHOLD = 0.25
         
-        self.out_dir = "/home/systest/Documents/repos/Milestone-Adaptive-Experience/agent/main_graph/data/out/"
-        self.gdino_model = load_model("../GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py", "../GroundingDINO/weights/groundingdino_swint_ogc.pth")
-        self.sam_checkpoint = "checkpoints/sam2.1_hiera_large.pt"
-        self.sam_model_cfg = "../sam2/configs/sam2.1/sam2.1_hiera_l.yaml"
+        self.out_dir = out_dir
+        self.gdino_model = load_model(gdino_model_cfg, gdino_checkpoint)
+        self.sam_checkpoint = sam_checkpoint
+        self.sam_model_cfg = "sam2.1_hiera_l.yaml"
         self.sam_predictor = SAM2ImagePredictor(build_sam2(self.sam_model_cfg, self.sam_checkpoint))
 
         self.image_np, self.image_g = load_image(self.image_path)
@@ -59,7 +73,7 @@ class GSAM_entity_masker():
         masked_img = cv.cvtColor(masked_img, cv.COLOR_BGR2RGB)
 
         #add full out dir path when finish testing 
-        masked_img_path = "annotated_image.jpg"
+        masked_img_path = self.out_dir + "/" + "premasked_" + self.image_path.split("/")[-1]
         cv.imwrite(masked_img_path, masked_img)
         
         return masked_img_path
