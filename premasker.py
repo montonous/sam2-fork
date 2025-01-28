@@ -42,7 +42,7 @@ class GSAM_entity_masker():
         self.out_dir = out_dir
         self.gdino_model = load_model(gdino_model_cfg, gdino_checkpoint)
         self.sam_checkpoint = sam_checkpoint
-        self.sam_model_cfg = "sam2.1_hiera_l.yaml"
+        self.sam_model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
         self.sam_predictor = SAM2ImagePredictor(build_sam2(self.sam_model_cfg, self.sam_checkpoint))
 
         self.image_np, self.image_g = load_image(self.image_path)
