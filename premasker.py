@@ -71,7 +71,8 @@ class GSAM_entity_masker():
             dsp_image = self.image_np
             masked_img = np.zeros_like(dsp_image)
             for mask_ in self.masks:
-                mask = mask_.squeeze(0)
+                if mask_.shape[0] == 1:
+                    mask = mask_.squeeze(0)                
                 mask_3ch = np.repeat(mask[:, :, np.newaxis], 3, axis=2)
                 masked_img = np.where(mask_3ch>0, dsp_image, masked_img)
             masked_img = cv.cvtColor(masked_img, cv.COLOR_BGR2RGB)
