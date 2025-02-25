@@ -6,6 +6,8 @@ import cv2 as cv
 import numpy as np
 import hydra
 
+FILTER_SIZE = (31, 31)
+
 def xywh_2_xyxy(boxes):
     x1 = boxes[:, 0] - boxes[:, 2] / 2
     y1 = boxes[:, 1] - boxes[:, 3] / 2
@@ -69,7 +71,7 @@ class GSAM_entity_masker():
                                                                 multimask_output=False)
             # ATM not saving masks, if we want to have several object with individual masks we need to act here
             dsp_image = self.image_np
-            masked_img = np.zeros_like(dsp_image)
+            masked_img = cv.GaussianBlur(dsp_image, FILTER_SIZE, 0)
             for mask_ in self.masks:
                 if mask_.shape[0] == 1:
                     mask = mask_.squeeze(0)                
@@ -86,7 +88,7 @@ class GSAM_entity_masker():
             return self.image_path
 
 if __name__ == '__main__':
-    image_path = "../../data/test_images/blue_woman.jpg"
+    image_path = "../../data/test_images/train_station_person_tracks_2_SDE.png"
     text = "car . person . woman"
     out_dir = "../../data/out/"
     gdino_checkpoint = "../GroundingDINO/weights/groundingdino_swint_ogc.pth"
